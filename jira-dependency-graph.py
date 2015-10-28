@@ -26,7 +26,7 @@ class JiraSearch(object):
     def __init__(self, url, auth):
         self.url = url + '/jira/rest/api/latest'
         self.auth = auth
-        self.fields = ','.join(['key', 'issuetype', 'issuelinks', 'subtasks'])
+        #self.fields = ','.join(['key', 'issuetype', 'issuelinks', 'subtasks'])
 
     def get(self, uri, params={}):
         headers = {'Content-Type' : 'application/json'}
@@ -44,13 +44,13 @@ class JiraSearch(object):
             with JIRA's REST API. """
         log('Fetching ' + key)
         # we need to expand subtasks and links since that's what we care about here.
-        response = self.get('/issue/%s' % key, params={'fields': self.fields})
+        response = self.get('/issue/%s' % key) # params={'fields': self.fields})
         return response.json()
 
     def query(self, query):
         log('Querying ' + query)
         # TODO comment
-        response = self.get('/search', params={'jql': query, 'fields': self.fields})
+        response = self.get('/search', params={'jql': query}) # 'fields': self.fields})
         content = response.json()
         return content['issues']
 
@@ -177,6 +177,8 @@ def main():
     jira = JiraSearch(options.jira_url, auth)
 
     epics = jira.query('project = MESOS AND issuetype = Epic AND status in (Open, "In Progress", Reviewable, Accepted)')
+
+    # Epic name is epic['fields']['customfield_12311121']
 
     nodes = set()
     edges = set()
